@@ -2,7 +2,9 @@ fastapi
 uvicorn[standard]
 sqlalchemy
 psycopg[binary,pool]
+asyncpg
 python-dotenv
+python-multipart
 pydantic
 qdrant-client
 sentence-transformers

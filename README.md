@@ -58,6 +58,18 @@ Services provided:
 
 The frontend is exposed on http://localhost:5173 by default, the API on http://localhost:8000.
 
+### Reviewer Experience Highlights
+
+The reviewer UI now supports end-to-end analysis without leaving the browser:
+
+* **Upload documents directly** – Drop new cloud guidelines or regulatory frameworks, and the
+  backend will extract, segment, embed, and generate candidate matches automatically.
+* **Interactive footnotes** – Selecting a guideline reveals inline highlights that act like
+  live footnotes. Hovering or clicking a highlight surfaces the linked regulation text,
+  similarity rationale, and confidence estimates.
+* **Context-rich inspection** – The match panel summarizes rationale, excerpts, and metadata so
+  IT teams can quickly judge whether internal guidance aligns with external obligations.
+
 ## Data Lifecycle
 
 1. **Ingestion**: Python workers, orchestrated by n8n, download documents, extract text
