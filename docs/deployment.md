@@ -117,3 +117,47 @@ Expose any additional ports you require (e.g., 5678 for n8n webhooks).
 Visit `http://<vm-ip>:5173` for the reviewer UI and
 `http://<vm-ip>:8000` for the REST API. For hardened access, place a reverse
 proxy such as Nginx or Caddy in front of the stack with TLS and authentication.
+
+### 8. Enable HTTPS with Caddy (Optional)
+
+Browsers will warn when you access the stack over HTTPS by IP address because
+public certificate authorities cannot issue valid TLS certificates for raw IPs.
+To eliminate the warning you must serve the site via a domain name that you
+control and terminate TLS in front of the containers. The repository ships with
+an optional [Caddy](https://caddyserver.com/) reverse proxy profile that
+automates certificate management once a DNS record points to your VM.
+
+1. Purchase or configure a domain/subdomain and create an `A` record that
+   resolves to your VM's public IP.
+2. Create or update a `.env` file in the repository root:
+
+   ```env
+   CADDY_DOMAIN=guidelines.example.com
+   CADDY_ACME_EMAIL=ops@example.com
+   ```
+
+   Caddy accepts multiple hostnames separated by spaces (e.g.,
+   `CADDY_DOMAIN="guidelines.example.com www.guidelines.example.com"`).
+3. Open ports 80 and 443 on the VM firewall:
+
+   ```bash
+   sudo ufw allow 80/tcp
+   sudo ufw allow 443/tcp
+   sudo ufw reload
+   ```
+
+4. Start the reverse proxy alongside the stack:
+
+   ```bash
+   docker compose --profile tls up -d caddy
+   ```
+
+   The `tls` profile leaves the existing HTTP port mappings in place so you can
+   verify the stack before cutting over DNS.
+5. Browse to `https://guidelines.example.com`. Caddy will obtain and renew
+   Let's Encrypt certificates automatically.
+
+If you cannot use a domain name, your only options are to continue with HTTP or
+install a self-signed certificate locally. Browsers will still display a
+warning in the self-signed case, but you can trust the certificate manually for
+your machine.

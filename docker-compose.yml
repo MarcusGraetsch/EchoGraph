@@ -39,6 +39,24 @@ services:
     depends_on:
       - api
 
+  caddy:
+    image: caddy:2.8
+    profiles:
+      - tls
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      CADDY_DOMAIN: ${CADDY_DOMAIN:-example.com}
+      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL:-admin@example.com}
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - frontend
+      - api
+
   ingestion-worker:
     build:
       context: .
@@ -58,3 +76,5 @@ services:
 volumes:
   postgres-data:
   qdrant-data:
+  caddy-data:
+  caddy-config:
