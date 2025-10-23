@@ -1,0 +1,6 @@
+resources:
+  - postgres.yaml
+  - qdrant.yaml
+  - api.yaml
+  - frontend.yaml
+  - ingress.yaml
