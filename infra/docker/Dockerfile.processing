@@ -1,0 +1,6 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY pyproject.toml README.md ./
+RUN pip install --no-cache-dir .[dev]
+COPY processing ./processing
+CMD ["python", "-c", "from processing.embeddings import EmbeddingService; EmbeddingService()._ensure_collection()"]
