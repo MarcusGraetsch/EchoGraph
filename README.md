@@ -76,6 +76,7 @@ The frontend is exposed on http://localhost:5173 by default, the API on http://l
 * [Ingestion Playbook](docs/ingestion.md)
 * [Human Validation Guide](docs/validation.md)
 * [Deployment](docs/deployment.md)
+* [Bare-metal Ubuntu Deployment](docs/deployment.md#bare-metal-ubuntu-2204-contabo-vm-setup)
 
 ## Contributing
 

@@ -6,3 +6,4 @@
 4. Use `docker compose up --build` to start local services.
 5. Visit the frontend at http://localhost:5173 and log in with your SSO provider (stubbed during
    development) to review matches.
+6. Deploying to a remote host? Follow the [bare-metal Ubuntu setup](deployment.md#bare-metal-ubuntu-2204-contabo-vm-setup).
