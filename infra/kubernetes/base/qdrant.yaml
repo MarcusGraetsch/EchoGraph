@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echograph-qdrant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echograph-qdrant
+  template:
+    metadata:
+      labels:
+        app: echograph-qdrant
+    spec:
+      containers:
+        - name: qdrant
+          image: qdrant/qdrant:latest
+          ports:
+            - containerPort: 6333
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echograph-qdrant
+spec:
+  selector:
+    app: echograph-qdrant
+  ports:
+    - port: 6333
+      targetPort: 6333
