@@ -10,15 +10,18 @@ from pathlib import Path
 
 def export_certificate(output: Path) -> None:
   output.parent.mkdir(parents=True, exist_ok=True)
-  command = [
-      "docker",
-      "compose",
-      "cp",
+  candidate_paths = [
+      "caddy:/data/pki/authorities/local/root.crt",
+      # Older compose bundles mounted the Caddy data directory under /data/caddy.
       "caddy:/data/caddy/pki/authorities/local/root.crt",
-      str(output),
   ]
   try:
-      subprocess.run(command, check=True)
+      for candidate in candidate_paths:
+          command = ["docker", "compose", "cp", candidate, str(output)]
+          completed = subprocess.run(command, check=False)
+          if completed.returncode == 0:
+              return
+      raise subprocess.CalledProcessError(returncode=completed.returncode, cmd=command)
   except FileNotFoundError as error:
       raise SystemExit("docker is required to export the certificate") from error
   except subprocess.CalledProcessError as error:
