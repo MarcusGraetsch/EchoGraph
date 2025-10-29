@@ -9,8 +9,8 @@ bootstrap: bootstrap-python bootstrap-api bootstrap-frontend download-demo
 bootstrap-python:
 	$(PYTHON) -m venv .venv && \
 	. .venv/bin/activate && \
-	pip install -U pip && \
-	pip install -e ./ingestion -e ./processing -r api/requirements.txt
+        pip install -U pip && \
+        pip install -e .[dev]
 
 bootstrap-api:
 	$(PYTHON) -m venv .venv-api && \

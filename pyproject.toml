@@ -56,3 +56,6 @@ combine-as-imports = true
 
 [tool.coverage.run]
 source = ["ingestion", "processing", "api"]
+
+[tool.setuptools.packages.find]
+include = ["api", "api.*", "ingestion", "ingestion.*", "processing", "processing.*"]
