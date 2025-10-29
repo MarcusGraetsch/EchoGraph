@@ -8,6 +8,8 @@ export const UploadPanel: React.FC = () => {
   const [language, setLanguage] = React.useState<string>('en');
   const [title, setTitle] = React.useState<string>('');
   const [file, setFile] = React.useState<File | null>(null);
+  const [progress, setProgress] = React.useState<number>(0);
+  const [isUploading, setIsUploading] = React.useState<boolean>(false);
   const uploadMutation = useUploadDocument();
 
   const resetForm = React.useCallback(() => {
@@ -36,12 +38,31 @@ export const UploadPanel: React.FC = () => {
     formData.append('language', language);
     formData.append('title', title.trim());
     formData.append('file', file);
-    uploadMutation.mutate(formData, {
-      onSuccess: () => {
-        resetForm();
+    setProgress(0);
+    setIsUploading(true);
+    uploadMutation.mutate(
+      { data: formData, onProgress: setProgress },
+      {
+        onSuccess: () => {
+          setProgress(100);
+          resetForm();
+        },
+        onError: () => {
+          setProgress(0);
+        },
+        onSettled: () => {
+          setTimeout(() => setIsUploading(false), 150);
+        },
       },
-    });
+    );
   };
+
+  React.useEffect(() => {
+    if (!uploadMutation.isPending && !uploadMutation.isError && !uploadMutation.isSuccess) {
+      setProgress(0);
+      setIsUploading(false);
+    }
+  }, [uploadMutation.isPending, uploadMutation.isError, uploadMutation.isSuccess]);
 
   return (
     <section className="upload-panel">
@@ -84,6 +105,14 @@ export const UploadPanel: React.FC = () => {
           {uploadMutation.isPending ? 'Uploading…' : 'Ingest document'}
         </button>
       </form>
+      {isUploading && (
+        <div className="upload-panel__progress" role="status" aria-live="polite">
+          <div className="upload-panel__progress-bar">
+            <div className="upload-panel__progress-fill" style={{ width: `${progress}%` }} aria-hidden="true" />
+          </div>
+          <span className="upload-panel__progress-label">{progress}%</span>
+        </div>
+      )}
       {uploadMutation.isSuccess && (
         <p className="upload-panel__status" role="status">
           {`Added ${uploadMutation.data.sections_created} sections and ${uploadMutation.data.matches_created} matches.`}

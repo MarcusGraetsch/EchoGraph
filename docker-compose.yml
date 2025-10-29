@@ -35,20 +35,19 @@ services:
       context: .
       dockerfile: infra/docker/Dockerfile.frontend
     ports:
-      - '5173:4173'
+      - '127.0.0.1:5173:4173'
     depends_on:
       - api
 
   caddy:
     image: caddy:2.8
-    profiles:
-      - tls
     ports:
       - '80:80'
       - '443:443'
     environment:
-      CADDY_DOMAIN: ${CADDY_DOMAIN:-example.com}
-      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL:-admin@example.com}
+      CADDY_DOMAIN: ${CADDY_DOMAIN:-:443}
+      CADDY_TLS_DIRECTIVE: ${CADDY_TLS_DIRECTIVE:-tls internal}
+      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL:-}
     volumes:
       - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data

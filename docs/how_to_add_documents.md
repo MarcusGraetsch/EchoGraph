@@ -2,7 +2,7 @@
 
 ## Option A — Upload through the reviewer UI
 
-1. Open the reviewer UI (`http://<host>:5173`) and locate the **Upload document** panel.
+1. Open the reviewer UI (`https://<host>`) and locate the **Upload document** panel.
 2. Select the document category (cloud guideline vs. regulation), pick the source file, and
    provide a descriptive title. Supported formats include PDF, DOC, DOCX, and TXT.
 3. Submit the form. The backend extracts text, segments the content, generates embeddings, and
