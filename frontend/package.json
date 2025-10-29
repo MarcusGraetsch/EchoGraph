@@ -31,6 +31,12 @@
   "pnpm": {
     "allowScripts": {
       "esbuild": true
-    }
+    },
+    "allowedBuiltDependencies": [
+      "esbuild"
+    ],
+    "trustedDependencies": [
+      "esbuild"
+    ]
   }
 }

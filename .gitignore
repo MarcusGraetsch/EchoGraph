@@ -11,6 +11,7 @@ pytest_cache/
 .DS_Store
 data/raw/
 data/processed/
+data/demo_docs/
 *.parquet
 *.jsonl
 .env.local

@@ -21,6 +21,7 @@ bootstrap-api:
 bootstrap-frontend:
 	npm install -g pnpm >/dev/null 2>&1 || true
 	cd frontend && $(PNPM) install
+	cd frontend && $(PNPM) approve-builds esbuild >/dev/null 2>&1 || true
 
 start:
 	docker compose up --build
