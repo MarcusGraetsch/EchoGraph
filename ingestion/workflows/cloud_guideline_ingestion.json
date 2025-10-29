@@ -1,0 +1,47 @@
+{
+  "name": "Cloud Guideline Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "cronExpression": "0 2 * * *"
+      },
+      "id": "schedule",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 240]
+    },
+    {
+      "parameters": {
+        "command": "python -m ingestion.cli {{ $json.sources.join(' ') }}"
+      },
+      "id": "ingest",
+      "name": "Run Ingestion",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [580, 240]
+    },
+    {
+      "parameters": {
+        "url": "https://example.com/demo_sources.json"
+      },
+      "id": "sources",
+      "name": "Fetch Sources",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [420, 420]
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [
+        [{ "node": "Fetch Sources", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Sources": {
+      "main": [
+        [{ "node": "Run Ingestion", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}
