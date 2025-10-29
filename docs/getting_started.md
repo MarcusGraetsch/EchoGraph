@@ -10,5 +10,6 @@
    `python scripts/export_caddy_root_ca.py` if this is your first run) and log in with your SSO
    provider (stubbed during development) to review matches. When accessing a remote deployment,
    open `https://<vm-ip>` instead of `http://<vm-ip>:5173`; Caddy binds the frontend container to
-   loopback and terminates TLS for external clients.
+   loopback and terminates TLS for external clients. Plain HTTP is also available on
+   `http://<vm-ip>` if you need a temporary fallback before trusting the certificate.
 6. Deploying to a remote host? Follow the [bare-metal Ubuntu setup](deployment.md#bare-metal-ubuntu-2204-contabo-vm-setup).

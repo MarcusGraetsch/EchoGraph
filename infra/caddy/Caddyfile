@@ -13,11 +13,11 @@
   }
 }
 
-:80 {
-  redir https://{host}{uri}
-}
-
 {$CADDY_DOMAIN} {
   {$CADDY_TLS_DIRECTIVE}
+  import common
+}
+
+:80 {
   import common
 }
