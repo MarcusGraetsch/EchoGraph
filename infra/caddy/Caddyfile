@@ -1,0 +1,23 @@
+{
+  email {$CADDY_ACME_EMAIL}
+}
+
+(common) {
+  @api path /api* /docs* /openapi.json /redoc
+  handle @api {
+    reverse_proxy api:8000
+  }
+
+  handle {
+    reverse_proxy frontend:4173
+  }
+}
+
+{$CADDY_DOMAIN} {
+  {$CADDY_TLS_DIRECTIVE}
+  import common
+}
+
+:80 {
+  import common
+}
