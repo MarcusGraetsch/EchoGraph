@@ -147,7 +147,11 @@ flag the connection as insecure even when you access the VM by IP address.
 
 Open `https://<vm-ip>` (or `https://<your-domain>` once configured) to use the
 reviewer UI. The API is available at `https://<vm-ip>/api`. Caddy automatically
-redirects HTTP traffic on port 80 to HTTPS.
+redirects HTTP traffic on port 80 to HTTPS. The `frontend` container itself is
+bound to `127.0.0.1:5173`, so browsing directly to `http://<vm-ip>:5173` will
+result in `ERR_CONNECTION_REFUSED` on remote hosts; always approach the stack
+through Caddy unless you intentionally reconfigure the compose file for
+plain HTTP access.
 
 ### 9. Use a public certificate (Optional)
 
