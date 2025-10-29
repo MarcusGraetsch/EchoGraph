@@ -1,0 +1,79 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: echograph
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - '6333:6333'
+    volumes:
+      - qdrant-data:/qdrant/storage
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.api
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/echograph
+    ports:
+      - '8000:8000'
+    depends_on:
+      - postgres
+      - qdrant
+
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.frontend
+    ports:
+      - '127.0.0.1:5173:4173'
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2.8
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: unless-stopped
+    environment:
+      CADDY_DOMAIN: ${CADDY_DOMAIN:-:443}
+      CADDY_TLS_DIRECTIVE: ${CADDY_TLS_DIRECTIVE:-tls internal}
+      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL:-}
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - frontend
+      - api
+
+  ingestion-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.ingestion
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/echograph
+    depends_on:
+      - postgres
+
+  processing-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.processing
+    depends_on:
+      - qdrant
+
+volumes:
+  postgres-data:
+  qdrant-data:
+  caddy-data:
+  caddy-config:
