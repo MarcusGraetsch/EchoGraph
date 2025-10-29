@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   postgres:
     image: postgres:15
@@ -44,6 +43,7 @@ services:
     ports:
       - '80:80'
       - '443:443'
+    restart: unless-stopped
     environment:
       CADDY_DOMAIN: ${CADDY_DOMAIN:-:443}
       CADDY_TLS_DIRECTIVE: ${CADDY_TLS_DIRECTIVE:-tls internal}

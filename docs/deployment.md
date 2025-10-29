@@ -129,9 +129,14 @@ repository directory) to copy the certificate out of the container:
 python3 scripts/export_caddy_root_ca.py --output caddy-root.crt
 ```
 
-The command copies the root certificate from the running Caddy container into
-`caddy-root.crt` on the VM. Download the file to your workstation with `scp`
-and import it into your operating system's trust store:
+The helper ensures the `caddy` service is running (starting it if necessary)
+and copies the root certificate into `caddy-root.crt` on the VM. If you have
+disabled the internal certificate authority—by clearing `CADDY_TLS_DIRECTIVE`
+to request public certificates, for example—the script exits with guidance
+rather than producing an empty file.
+
+Download the certificate to your workstation with `scp` and import it into
+your operating system's trust store:
 
 * **Windows**: Run `certmgr.msc`, import the file into “Trusted Root Certification
   Authorities”.
