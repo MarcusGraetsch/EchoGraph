@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+from contextlib import contextmanager
 from dataclasses import dataclass
 
 import psycopg
@@ -45,6 +46,25 @@ class SyncResult:
 
     role_created: bool
     database_created: bool
+
+
+@contextmanager
+def _temporary_autocommit(conn: psycopg.Connection):
+    """Temporarily enable autocommit on ``conn`` while inside the context."""
+
+    # ``CREATE DATABASE`` must run outside a transaction block, so we temporarily
+    # switch the connection to autocommit mode while provisioning the Keycloak
+    # role and schema.  Psycopg automatically commits on context manager exit
+    # when no exception is raised, but the autocommit toggle keeps the helper
+    # compatible with clean installations where the database does not yet exist.
+
+    previous = getattr(conn, "autocommit", False)
+    conn.autocommit = True
+
+    try:
+        yield
+    finally:
+        conn.autocommit = previous
 
 
 def ensure_role(conn: psycopg.Connection, username: str, password: str) -> bool:
@@ -115,8 +135,10 @@ def synchronize_keycloak_credentials(
 ) -> SyncResult:
     """Ensure the Keycloak PostgreSQL role and database exist."""
 
-    role_created = ensure_role(conn, username, password)
-    database_created = ensure_database(conn, database, username)
+    with _temporary_autocommit(conn):
+        role_created = ensure_role(conn, username, password)
+        database_created = ensure_database(conn, database, username)
+
     return SyncResult(role_created=role_created, database_created=database_created)
 
 

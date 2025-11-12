@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from unittest import mock
 
+import pytest
+
 from psycopg import sql
 
 from scripts.sync_keycloak_credentials import (
@@ -76,7 +78,40 @@ def test_synchronize_returns_result_dataclass() -> None:
     conn, cursor = _prepare_conn()
     # First fetchone call -> role exists, second -> database missing
     cursor.fetchone.side_effect = [(1,), None]
+    conn.autocommit = False
 
     result = synchronize_keycloak_credentials(conn, "keycloak", "secret", "keycloak")
 
     assert result == SyncResult(role_created=False, database_created=True)
+    assert conn.autocommit is False
+
+
+def test_synchronize_restores_autocommit_when_ensure_raises(monkeypatch: pytest.MonkeyPatch) -> None:
+    conn, _ = _prepare_conn()
+    conn.autocommit = False
+
+    def _boom(*_: object, **__: object) -> bool:
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr("scripts.sync_keycloak_credentials.ensure_role", _boom)
+
+    with pytest.raises(RuntimeError):
+        synchronize_keycloak_credentials(conn, "keycloak", "secret", "keycloak")
+
+    assert conn.autocommit is False
+
+
+def test_autocommit_enabled_during_operations(monkeypatch: pytest.MonkeyPatch) -> None:
+    conn, cursor = _prepare_conn()
+    conn.autocommit = False
+
+    def _assert_autocommit(*args: object, **kwargs: object) -> bool:
+        assert args[0].autocommit is True
+        return ensure_role(*args, **kwargs)
+
+    monkeypatch.setattr("scripts.sync_keycloak_credentials.ensure_role", _assert_autocommit)
+
+    cursor.fetchone.side_effect = [(1,), (1,)]
+
+    synchronize_keycloak_credentials(conn, "keycloak", "secret", "keycloak")
+    assert conn.autocommit is False
