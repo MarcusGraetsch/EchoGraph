@@ -185,3 +185,23 @@ Caddy to request Let's Encrypt certificates instead of the internal CA.
 
 4. Visit `https://guidelines.example.com` to confirm the browser no longer
    prompts for certificate trust.
+
+### 10. Synchronize Keycloak database credentials
+
+Self-hosted deployments that enable Keycloak for authentication must ensure the
+PostgreSQL role and database match the credentials configured for the Keycloak
+container. Run the helper script from the repository root after Docker services
+are up:
+
+```bash
+python3 scripts/sync_keycloak_credentials.py \
+  --postgres-url postgresql://postgres:postgres@localhost:5432/postgres \
+  --keycloak-username keycloak \
+  --keycloak-password "$KEYCLOAK_DB_PASSWORD" \
+  --keycloak-database keycloak
+```
+
+The script creates the role or updates its password as needed and assigns
+ownership of the Keycloak database. Using parameterised SQL via `psycopg`
+prevents the "syntax error at or near" failures that could arise when passwords
+contain special characters.
